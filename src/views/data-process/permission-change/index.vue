@@ -19,10 +19,11 @@
     </div>
 
     <el-table :data="tableData" border fit highlight-current-row>
-      <el-table-column label="people" prop="people" width="160px" align="center" />
-      <el-table-column label="change_pr_number" prop="change_pr_number" width="160px" align="center" />
-      <el-table-column label="change_role_time" prop="change_role_time" width="160px" align="center" />
-      <el-table-column label="change_role" prop="change_role" width="160px" align="center" />
+      <el-table-column label="项目" prop="project" width="160px" align="center" />
+      <el-table-column label="人员" prop="people" width="160px" align="center" />
+      <el-table-column label="变更发生的PR" prop="change_pr_number" width="160px" align="center" />
+      <el-table-column label="变更时间" prop="change_role_time" width="160px" align="center" />
+      <el-table-column label="变更权限" prop="change_role" width="160px" align="center" />
     </el-table>
   </div>
 </template>
@@ -41,12 +42,14 @@ export default {
       },
       tableData: [
         {
+          project: 'dubbo',
           people: 'tom',
           change_pr_number: 12,
           change_role_time: '2022-12-31 10:12:22',
           change_role: 'reviewer'
         },
         {
+          project: 'dubbo',
           people: 'jim',
           change_pr_number: 6,
           change_role_time: '2022-11-31 10:12:22',

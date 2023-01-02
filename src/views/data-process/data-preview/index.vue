@@ -46,7 +46,7 @@
       :current-page="listQuery.curPage"
       :page-sizes="[20, 50, 100]"
       :page-size="listQuery.pageSize"
-      :total="tableData.length"
+      :total="listQuery.total"
       background
       layout="prev, pager, next, jumper, sizes, total"
       @size-change="handleSizeChange"
@@ -68,6 +68,7 @@ export default {
       listQuery: {
         curPage: 1,
         pageSize: 20,
+        total: 100,
         project: '',
         scene: '',
         pr_number: ''
