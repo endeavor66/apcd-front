@@ -129,6 +129,83 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
+  // 新增路由
+  {
+    path: '/data-process',
+    component: Layout,
+    alwaysShow: true, // will always show the root menu
+    name: 'DataProcess',
+    meta: { title: '数据处理' },
+    children: [
+      {
+        path: 'file-upload',
+        component: () => import('@/views/data-process/file-upload'),
+        name: 'FileUpload',
+        meta: { title: '数据上传' }
+      },
+      {
+        path: 'data-preview',
+        component: () => import('@/views/data-process/data-preview'),
+        name: 'DataPreview',
+        meta: { title: '数据预览' }
+      },
+      {
+        path: 'permission-change',
+        component: () => import('@/views/data-process/permission-change'),
+        name: 'PermissionChange',
+        meta: { title: '权限变更人员' }
+      }
+    ]
+  },
+  {
+    path: '/process-mining',
+    component: Layout,
+    alwaysShow: true, // will always show the root menu
+    name: 'ProcessMining',
+    meta: { title: '过程挖掘' },
+    children: [
+      {
+        path: 'process-discovery',
+        component: () => import('@/views/process-minging/process-discovery'),
+        name: 'ProcessDiscovery',
+        meta: { title: '构建主流模式' }
+      },
+      {
+        path: 'process-model',
+        component: () => import('@/views/process-minging/process-model'),
+        name: 'ProcessModel',
+        meta: { title: '查看主流模式' }
+      },
+      {
+        path: 'conformance-checking',
+        component: () => import('@/views/process-minging/conformance-checking'),
+        name: 'ConformanceChecking',
+        meta: { title: '一致性检验' }
+      }
+    ]
+  },
+  {
+    path: '/anomaly',
+    component: Layout,
+    alwaysShow: true, // will always show the root menu
+    name: 'Anomaly',
+    meta: { title: '异常检测' },
+    children: [
+      {
+        path: 'algorithm',
+        component: () => import('@/views/anomaly/algorithm'),
+        name: 'Algorithm',
+        meta: { title: '模型训练' }
+      },
+      {
+        path: 'anomaly-result',
+        component: () => import('@/views/anomaly/anomaly-result'),
+        name: 'AnomalyResult',
+        meta: { title: '异常检测结果' }
+      }
+    ]
+  },
+  // 已有路由
   {
     path: '/permission',
     component: Layout,
