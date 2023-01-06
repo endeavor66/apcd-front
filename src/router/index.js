@@ -166,19 +166,19 @@ export const asyncRoutes = [
     children: [
       {
         path: 'process-discovery',
-        component: () => import('@/views/process-minging/process-discovery'),
+        component: () => import('@/views/process-mining/process-discovery'),
         name: 'ProcessDiscovery',
         meta: { title: '构建主流模式' }
       },
       {
         path: 'process-model',
-        component: () => import('@/views/process-minging/process-model'),
+        component: () => import('@/views/process-mining/process-model'),
         name: 'ProcessModel',
         meta: { title: '查看主流模式' }
       },
       {
         path: 'conformance-checking',
-        component: () => import('@/views/process-minging/conformance-checking'),
+        component: () => import('@/views/process-mining/conformance-checking'),
         name: 'ConformanceChecking',
         meta: { title: '一致性检验' }
       }
@@ -195,7 +195,7 @@ export const asyncRoutes = [
         path: 'algorithm',
         component: () => import('@/views/anomaly/algorithm'),
         name: 'Algorithm',
-        meta: { title: '模型训练' }
+        meta: { title: '执行异常检测' }
       },
       {
         path: 'anomaly-result',

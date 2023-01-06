@@ -20,10 +20,34 @@ import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 
-import { Upload } from 'element-ui'
 import axios from 'axios'
+// 引入相关API请求接口
+import API from '@/api'
 
 Vue.prototype.$axios = axios
+Vue.prototype.$API = API
+
+// 日期格式化函数
+Date.prototype.format = function(fmt) {
+  var o = {
+    'M+': this.getMonth() + 1, // 月份
+    'd+': this.getDate(), // 日
+    'h+': this.getHours(), // 小时
+    'm+': this.getMinutes(), // 分
+    's+': this.getSeconds(), // 秒
+    'q+': Math.floor((this.getMonth() + 3) / 3), // 季度
+    'S': this.getMilliseconds() // 毫秒
+  }
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length))
+  }
+  for (var k in o) {
+    if (new RegExp('(' + k + ')').test(fmt)) {
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
+    }
+  }
+  return fmt
+}
 
 /**
  * If you don't want to use mock-server
@@ -39,8 +63,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 Vue.use(Element, {
-  size: Cookies.get('size') || 'medium', // set element-ui default size
-  locale: enLang // 如果使用中文，无需设置，请删除
+  size: Cookies.get('size') || 'medium' // set element-ui default size
+  // locale: enLang // 如果使用中文，无需设置，请删除
 })
 
 // register global utility filters

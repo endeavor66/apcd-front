@@ -3,16 +3,12 @@
     <el-tabs v-model="activeName">
       <el-tab-pane label="文件上传" name="first">
         <el-form>
-          <el-form-item label="项目名" :label-width="formLabelWidth">
-            <el-input v-model="project" class="projectInput" clearable />
-          </el-form-item>
           <el-form-item label="日志文件" :label-width="formLabelWidth">
             <el-upload
               ref="upload"
               drag
               action
               multiple
-              :on-success="handleSuccess"
               :on-change="handleChange"
               :file-list="fileList"
               :auto-upload="false"
@@ -35,6 +31,7 @@
                 <i class="el-icon-loading" />
               </span>
             </el-button>
+            <el-button type="primary" @click="dialogFormVisible=true">数据预处理</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -50,26 +47,58 @@
       </el-tab-pane>
     </el-tabs>
 
+    <el-dialog title="参数配置" :visible.sync="dialogFormVisible">
+      <el-form>
+        <el-form-item label="项目名" :label-width="formLabelWidth">
+          <el-input v-model="projects" class="projectInput" placeholder="项目之间用逗号分隔" clearable />
+        </el-form-item>
+        <el-form-item label="时间范围" :label-width="formLabelWidth">
+          <el-date-picker
+            v-model="daterange"
+            type="daterange"
+            value-format="yyyy-MM-dd"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dataPreprocess">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { upload, getUploadRecord } from '@/api/event-log'
+import { mapState } from 'vuex'
 export default {
   name: 'DataUpload',
   data() {
     return {
-      project: '',
+      projects: '',
       isUploadFlag: false,
       fileList: [],
       settingVisible: false,
       formLabelWidth: '80px',
       tableData: [],
-      activeName: 'first'
+      activeName: 'first',
+      daterange: [],
+      dialogFormVisible: false
     }
   },
+  computed: {
+    ...mapState('project', ['projectList'])
+  },
   mounted() {
+    // 获取所有历史上传记录
     this.getHistoryUploadRecord()
+    // 获取已经处理过的project
+    this.$API.project.getProjectList().then((res) => {
+      this.$store.dispatch('project/init', res.data)
+    }).catch((err) => {
+      this.$message.error(err)
+    })
   },
   methods: {
     submitUpload() {
@@ -79,59 +108,58 @@ export default {
       this.fileList.forEach((file) => {
         formData.append('fileList', file.raw)
       })
-      formData.append('project', this.project)
       // 开始传输
-      upload(formData).then((res) => {
+      this.$API.dataProcess.upload(formData).then((res) => {
         this.isUploadFlag = false
         this.$refs.upload.clearFiles()
         this.$message.success('上传成功,' + res.message)
+        // 重新获取上传记录
+        this.getHistoryUploadRecord()
+      }).catch((err) => {
+        this.isUploadFlag = false
+        this.$message.error(err)
       })
-        .catch((err) => {
-          this.isUploadFlag = false
-          this.$message.error(err)
-        })
-      // 重新获取上传记录
-      this.getHistoryUploadRecord()
     },
-    handleSuccess(response, file, fileList) {
-      console.log('文件上传成功后的钩子')
-    },
+    // 文件状态改变时的钩子
     handleChange(file, fileList) {
-      console.log('文件状态改变时的钩子')
-      console.log(file, fileList)
       this.fileList = fileList
     },
+    // 数据预处理
+    dataPreprocess() {
+      const param = {
+        'projectList': this.projects,
+        'start': this.daterange[0],
+        'end': this.daterange[1]
+      }
+      this.$API.dataProcess.processData(param).then((res) => {
+        this.$message.success(res.message)
+        // 更新store中的projectList
+        const projectArr = this.projects.split(',')
+        projectArr.forEach(e => {
+          this.$store.dispatch('project/addProject', e)
+        })
+      }).catch((err) => {
+        this.$message.error(err)
+      })
+    },
+    // 获取历史上传记录
     getHistoryUploadRecord() {
       // TODO 发送请求获取数据
-      getUploadRecord().then((res) => {
-        console.log(res)
+      this.$API.dataProcess.getUploadRecord().then((res) => {
         const datas = res.data
         this.tableData = datas
+      }).catch((err) => {
+        this.$message.error(err)
       })
-        .catch((err) => {
-          console.log(err)
-        })
-
-      // 示例数据
-      // this.tableData = [
-      //   {
-      //     'success_file_number': 2,
-      //     'success_file_name': 'a.csv,b.csv',
-      //     'error_file_number': 1,
-      //     'error_file_name': 'c.csv',
-      //     'operate_time': '2022-01-03 11:10:12',
-      //     'operator': 'admin'
-      //   }
-      // ]
     },
+    // 格式化日期
     formatDate(row, column) {
       // 获取单元格数据
       const data = row[column.property]
       if (data == null) {
         return null
       }
-      const dt = new Date(data)
-      return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate() + ' ' + dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds()
+      return new Date(data).format('yyyy-MM-dd hh:mm:ss')
     }
   }
 }
